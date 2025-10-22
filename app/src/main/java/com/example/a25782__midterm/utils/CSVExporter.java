@@ -1,7 +1,11 @@
 package com.example.a25782__midterm.utils;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import com.example.a25782__midterm.models.Course;
@@ -11,6 +15,7 @@ import com.example.a25782__midterm.models.Student;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -24,32 +29,29 @@ public class CSVExporter {
         this.context = context;
     }
 
-    // Helper method to get the appropriate directory for saving files
-    private File getExportDirectory() {
-        // For Android 10+ (API 29+), use the app's external files directory
-        // This is accessible via file managers and doesn't require special permissions
-        File appExternalDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-        if (appExternalDir != null) {
-            if (!appExternalDir.exists()) {
-                appExternalDir.mkdirs();
+    // Helper method to save file to public Downloads folder using MediaStore
+    private String saveToDownloads(String fileName, String content) {
+        try {
+            ContentResolver resolver = context.getContentResolver();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "text/csv");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+            
+            Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
+            if (uri != null) {
+                OutputStream outputStream = resolver.openOutputStream(uri);
+                if (outputStream != null) {
+                    outputStream.write(content.getBytes());
+                    outputStream.close();
+                    Log.d("CSVExporter", "File saved to Downloads: " + fileName);
+                    return "Downloads/" + fileName;
+                }
             }
-            Log.d("CSVExporter", "Using app external Downloads directory: " + appExternalDir.getAbsolutePath());
-            return appExternalDir;
+        } catch (IOException e) {
+            Log.e("CSVExporter", "Error saving to Downloads", e);
         }
-        
-        // Fallback to app's external files directory
-        File externalFilesDir = context.getExternalFilesDir(null);
-        if (externalFilesDir != null) {
-            if (!externalFilesDir.exists()) {
-                externalFilesDir.mkdirs();
-            }
-            Log.d("CSVExporter", "Using external files directory: " + externalFilesDir.getAbsolutePath());
-            return externalFilesDir;
-        }
-        
-        // Last resort: app's internal files directory
-        Log.d("CSVExporter", "Using internal files directory: " + context.getFilesDir().getAbsolutePath());
-        return context.getFilesDir();
+        return null;
     }
 
     // Export students to CSV
@@ -58,27 +60,26 @@ public class CSVExporter {
         String fileName = "students_" + timestamp + ".csv";
         
         try {
-            File exportDir = getExportDirectory();
-            File file = new File(exportDir, fileName);
-            FileWriter writer = new FileWriter(file);
+            StringBuilder csvContent = new StringBuilder();
             
             // Write header
-            writer.append("ID,Name,Email,Phone\n");
+            csvContent.append("ID,Name,Email,Phone\n");
             
             // Write data
             for (Student student : students) {
-                writer.append(String.valueOf(student.getId())).append(",");
-                writer.append(escapeCSV(student.getName())).append(",");
-                writer.append(escapeCSV(student.getEmail())).append(",");
-                writer.append(escapeCSV(student.getPhone())).append("\n");
+                csvContent.append(String.valueOf(student.getId())).append(",");
+                csvContent.append(escapeCSV(student.getName())).append(",");
+                csvContent.append(escapeCSV(student.getEmail())).append(",");
+                csvContent.append(escapeCSV(student.getPhone())).append("\n");
             }
             
-            writer.flush();
-            writer.close();
-            
-            Log.d("CSVExporter", "Students exported to: " + file.getAbsolutePath());
-            return file.getAbsolutePath();
-        } catch (IOException e) {
+            String result = saveToDownloads(fileName, csvContent.toString());
+            if (result != null) {
+                Log.d("CSVExporter", "Students exported to: " + result);
+                return result;
+            }
+            return null;
+        } catch (Exception e) {
             Log.e("CSVExporter", "Error exporting students", e);
             e.printStackTrace();
             return null;
@@ -159,50 +160,49 @@ public class CSVExporter {
         String fileName = "all_data_" + timestamp + ".csv";
         
         try {
-            File exportDir = getExportDirectory();
-            File file = new File(exportDir, fileName);
-            FileWriter writer = new FileWriter(file);
+            StringBuilder csvContent = new StringBuilder();
             
             // Students section
-            writer.append("=== STUDENTS ===\n");
-            writer.append("ID,Name,Email,Phone\n");
+            csvContent.append("=== STUDENTS ===\n");
+            csvContent.append("ID,Name,Email,Phone\n");
             for (Student student : students) {
-                writer.append(String.valueOf(student.getId())).append(",");
-                writer.append(escapeCSV(student.getName())).append(",");
-                writer.append(escapeCSV(student.getEmail())).append(",");
-                writer.append(escapeCSV(student.getPhone())).append("\n");
+                csvContent.append(String.valueOf(student.getId())).append(",");
+                csvContent.append(escapeCSV(student.getName())).append(",");
+                csvContent.append(escapeCSV(student.getEmail())).append(",");
+                csvContent.append(escapeCSV(student.getPhone())).append("\n");
             }
-            writer.append("\n");
+            csvContent.append("\n");
             
             // Courses section
-            writer.append("=== COURSES ===\n");
-            writer.append("ID,Course Name,Course Code,Credits\n");
+            csvContent.append("=== COURSES ===\n");
+            csvContent.append("ID,Course Name,Course Code,Credits\n");
             for (Course course : courses) {
-                writer.append(String.valueOf(course.getId())).append(",");
-                writer.append(escapeCSV(course.getCourseName())).append(",");
-                writer.append(escapeCSV(course.getCourseCode())).append(",");
-                writer.append(String.valueOf(course.getCredits())).append("\n");
+                csvContent.append(String.valueOf(course.getId())).append(",");
+                csvContent.append(escapeCSV(course.getCourseName())).append(",");
+                csvContent.append(escapeCSV(course.getCourseCode())).append(",");
+                csvContent.append(String.valueOf(course.getCredits())).append("\n");
             }
-            writer.append("\n");
+            csvContent.append("\n");
             
             // Enrollments section
-            writer.append("=== ENROLLMENTS ===\n");
-            writer.append("ID,Student ID,Student Name,Course ID,Course Name,Date Enrolled\n");
+            csvContent.append("=== ENROLLMENTS ===\n");
+            csvContent.append("ID,Student ID,Student Name,Course ID,Course Name,Date Enrolled\n");
             for (Enrollment enrollment : enrollments) {
-                writer.append(String.valueOf(enrollment.getId())).append(",");
-                writer.append(String.valueOf(enrollment.getStudentId())).append(",");
-                writer.append(escapeCSV(enrollment.getStudentName())).append(",");
-                writer.append(String.valueOf(enrollment.getCourseId())).append(",");
-                writer.append(escapeCSV(enrollment.getCourseName())).append(",");
-                writer.append(escapeCSV(enrollment.getDateEnrolled())).append("\n");
+                csvContent.append(String.valueOf(enrollment.getId())).append(",");
+                csvContent.append(String.valueOf(enrollment.getStudentId())).append(",");
+                csvContent.append(escapeCSV(enrollment.getStudentName())).append(",");
+                csvContent.append(String.valueOf(enrollment.getCourseId())).append(",");
+                csvContent.append(escapeCSV(enrollment.getCourseName())).append(",");
+                csvContent.append(escapeCSV(enrollment.getDateEnrolled())).append("\n");
             }
             
-            writer.flush();
-            writer.close();
-            
-            Log.d("CSVExporter", "All data exported to: " + file.getAbsolutePath());
-            return file.getAbsolutePath();
-        } catch (IOException e) {
+            String result = saveToDownloads(fileName, csvContent.toString());
+            if (result != null) {
+                Log.d("CSVExporter", "All data exported to: " + result);
+                return result;
+            }
+            return null;
+        } catch (Exception e) {
             Log.e("CSVExporter", "Error exporting all data", e);
             e.printStackTrace();
             return null;
