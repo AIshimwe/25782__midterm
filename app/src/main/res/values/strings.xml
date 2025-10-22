@@ -1,3 +1,43 @@
 <resources>
     <string name="app_name">25782__midterm</string>
+    <string name="app_title">Academic Management System</string>
+    
+    <!-- Main Menu Buttons -->
+    <string name="btn_manage_student">Manage Student</string>
+    <string name="btn_manage_course">Manage Course</string>
+    <string name="btn_enroll_student">Enroll Student</string>
+    <string name="btn_view_enrollments">View Enrollments</string>
+    
+    <!-- Activity Titles -->
+    <string name="title_manage_student">Manage Students</string>
+    <string name="title_manage_course">Manage Courses</string>
+    <string name="title_enroll_student">Enroll Student</string>
+    <string name="title_view_enrollments">View Enrollments</string>
+    
+    <!-- Student Fields -->
+    <string name="hint_student_name">Student Name</string>
+    <string name="hint_student_email">Email Address</string>
+    <string name="hint_student_phone">Phone Number</string>
+    
+    <!-- Course Fields -->
+    <string name="hint_course_name">Course Name</string>
+    <string name="hint_course_code">Course Code</string>
+    <string name="hint_credits">Credits</string>
+    
+    <!-- Action Buttons -->
+    <string name="btn_save">Save</string>
+    <string name="btn_update">Update</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_clear">Clear</string>
+    <string name="btn_back">Back</string>
+    <string name="btn_enroll">Enroll Student</string>
+    <string name="btn_export_csv">Export to CSV</string>
+    
+    <!-- Labels -->
+    <string name="label_student_list">Student List</string>
+    <string name="label_course_list">Course List</string>
+    <string name="label_select_student">Select Student:</string>
+    <string name="label_select_course">Select Course:</string>
+    <string name="label_current_enrollments">Current Enrollments</string>
+    <string name="label_all_enrollments">All Enrollments</string>
 </resources>
