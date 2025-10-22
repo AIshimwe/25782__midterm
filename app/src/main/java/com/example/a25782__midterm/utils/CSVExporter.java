@@ -92,27 +92,26 @@ public class CSVExporter {
         String fileName = "courses_" + timestamp + ".csv";
         
         try {
-            File exportDir = getExportDirectory();
-            File file = new File(exportDir, fileName);
-            FileWriter writer = new FileWriter(file);
+            StringBuilder csvContent = new StringBuilder();
             
             // Write header
-            writer.append("ID,Course Name,Course Code,Credits\n");
+            csvContent.append("ID,Course Name,Course Code,Credits\n");
             
             // Write data
             for (Course course : courses) {
-                writer.append(String.valueOf(course.getId())).append(",");
-                writer.append(escapeCSV(course.getCourseName())).append(",");
-                writer.append(escapeCSV(course.getCourseCode())).append(",");
-                writer.append(String.valueOf(course.getCredits())).append("\n");
+                csvContent.append(String.valueOf(course.getId())).append(",");
+                csvContent.append(escapeCSV(course.getCourseName())).append(",");
+                csvContent.append(escapeCSV(course.getCourseCode())).append(",");
+                csvContent.append(String.valueOf(course.getCredits())).append("\n");
             }
             
-            writer.flush();
-            writer.close();
-            
-            Log.d("CSVExporter", "Courses exported to: " + file.getAbsolutePath());
-            return file.getAbsolutePath();
-        } catch (IOException e) {
+            String result = saveToDownloads(fileName, csvContent.toString());
+            if (result != null) {
+                Log.d("CSVExporter", "Courses exported to: " + result);
+                return result;
+            }
+            return null;
+        } catch (Exception e) {
             Log.e("CSVExporter", "Error exporting courses", e);
             e.printStackTrace();
             return null;
@@ -125,29 +124,28 @@ public class CSVExporter {
         String fileName = "enrollments_" + timestamp + ".csv";
         
         try {
-            File exportDir = getExportDirectory();
-            File file = new File(exportDir, fileName);
-            FileWriter writer = new FileWriter(file);
+            StringBuilder csvContent = new StringBuilder();
             
             // Write header
-            writer.append("ID,Student ID,Student Name,Course ID,Course Name,Date Enrolled\n");
+            csvContent.append("ID,Student ID,Student Name,Course ID,Course Name,Date Enrolled\n");
             
             // Write data
             for (Enrollment enrollment : enrollments) {
-                writer.append(String.valueOf(enrollment.getId())).append(",");
-                writer.append(String.valueOf(enrollment.getStudentId())).append(",");
-                writer.append(escapeCSV(enrollment.getStudentName())).append(",");
-                writer.append(String.valueOf(enrollment.getCourseId())).append(",");
-                writer.append(escapeCSV(enrollment.getCourseName())).append(",");
-                writer.append(escapeCSV(enrollment.getDateEnrolled())).append("\n");
+                csvContent.append(String.valueOf(enrollment.getId())).append(",");
+                csvContent.append(String.valueOf(enrollment.getStudentId())).append(",");
+                csvContent.append(escapeCSV(enrollment.getStudentName())).append(",");
+                csvContent.append(String.valueOf(enrollment.getCourseId())).append(",");
+                csvContent.append(escapeCSV(enrollment.getCourseName())).append(",");
+                csvContent.append(escapeCSV(enrollment.getDateEnrolled())).append("\n");
             }
             
-            writer.flush();
-            writer.close();
-            
-            Log.d("CSVExporter", "Enrollments exported to: " + file.getAbsolutePath());
-            return file.getAbsolutePath();
-        } catch (IOException e) {
+            String result = saveToDownloads(fileName, csvContent.toString());
+            if (result != null) {
+                Log.d("CSVExporter", "Enrollments exported to: " + result);
+                return result;
+            }
+            return null;
+        } catch (Exception e) {
             Log.e("CSVExporter", "Error exporting enrollments", e);
             e.printStackTrace();
             return null;
