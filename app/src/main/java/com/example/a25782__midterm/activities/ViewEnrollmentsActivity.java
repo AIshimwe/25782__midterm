@@ -101,19 +101,16 @@ public class ViewEnrollmentsActivity extends AppCompatActivity {
         if (filePath != null) {
             // Extract just the filename and directory for a cleaner message
             String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
-            String directory = filePath.substring(0, filePath.lastIndexOf("/"));
-            String directoryName = directory.substring(directory.lastIndexOf("/") + 1);
             
-            String message = "Data exported successfully!\n" +
-                           "File: " + fileName + "\n" +
-                           "Location: " + directoryName + " folder\n" +
-                           "To access: Use a file manager app\n" +
-                           "Path: " + filePath;
+            String message = "✅ CSV exported successfully!\n" +
+                           "📁 File: " + fileName + "\n" +
+                           "📍 Location: Downloads folder\n" +
+                           "💡 Tip: Open with Excel, Google Sheets, or any text editor";
             
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             preferencesHelper.saveString("last_export_path", filePath);
         } else {
-            Toast.makeText(this, "Failed to export data", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "❌ Failed to export data", Toast.LENGTH_SHORT).show();
         }
     }
 }

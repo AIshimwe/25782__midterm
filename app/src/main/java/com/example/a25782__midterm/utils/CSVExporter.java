@@ -34,16 +34,29 @@ public class CSVExporter {
         try {
             ContentResolver resolver = context.getContentResolver();
             ContentValues contentValues = new ContentValues();
+            
+            // Ensure filename has .csv extension
+            if (!fileName.endsWith(".csv")) {
+                fileName = fileName + ".csv";
+            }
+            
             contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
             contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "text/csv");
             contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+            contentValues.put(MediaStore.MediaColumns.IS_PENDING, 1);
             
             Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
             if (uri != null) {
                 OutputStream outputStream = resolver.openOutputStream(uri);
                 if (outputStream != null) {
-                    outputStream.write(content.getBytes());
+                    outputStream.write(content.getBytes("UTF-8"));
                     outputStream.close();
+                    
+                    // Mark as no longer pending
+                    contentValues.clear();
+                    contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0);
+                    resolver.update(uri, contentValues, null, null);
+                    
                     Log.d("CSVExporter", "File saved to Downloads: " + fileName);
                     return "Downloads/" + fileName;
                 }
