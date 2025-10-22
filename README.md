@@ -1,93 +1,270 @@
-# 25782_midterm
+# 25782__midterm - Academic Management System
 
+## 📋 Project Overview
+This is a complete Android application built using **Java only** that implements an Academic Management System. The app manages Students, Courses, and Enrollments with full CRUD operations, data persistence using SQLite, and CSV export functionality.
 
+## 🏗️ Architecture
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
+### Package Structure
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/AIshimwe/25782_midterm.git
-git branch -M main
-git push -uf origin main
+com.example.a25782__midterm/
+├── activities/          # All Activity classes
+│   ├── MainActivity.java
+│   ├── ManageStudentActivity.java
+│   ├── ManageCourseActivity.java
+│   ├── EnrollStudentActivity.java
+│   └── ViewEnrollmentsActivity.java
+├── models/              # Data model classes
+│   ├── Student.java
+│   ├── Course.java
+│   └── Enrollment.java
+├── dao/                 # Database access objects
+│   ├── DBHelper.java
+│   ├── StudentDAO.java
+│   ├── CourseDAO.java
+│   └── EnrollmentDAO.java
+└── utils/               # Utility classes
+    ├── CSVExporter.java
+    └── PreferencesHelper.java
 ```
 
-## Integrate with your tools
+## 🗄️ Database Schema
 
-- [ ] [Set up project integrations](https://gitlab.com/AIshimwe/25782_midterm/-/settings/integrations)
+### Students Table
+- `id` (INTEGER, PRIMARY KEY, AUTOINCREMENT)
+- `name` (TEXT, NOT NULL)
+- `email` (TEXT, NOT NULL)
+- `phone` (TEXT, NOT NULL)
 
-## Collaborate with your team
+### Courses Table
+- `id` (INTEGER, PRIMARY KEY, AUTOINCREMENT)
+- `courseName` (TEXT, NOT NULL)
+- `courseCode` (TEXT, NOT NULL, UNIQUE)
+- `credits` (INTEGER, NOT NULL)
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### Enrollments Table
+- `id` (INTEGER, PRIMARY KEY, AUTOINCREMENT)
+- `student_id` (INTEGER, FOREIGN KEY → students.id)
+- `course_id` (INTEGER, FOREIGN KEY → courses.id)
+- `date_enrolled` (TEXT, NOT NULL)
 
-## Test and Deploy
+**Note:** Foreign key constraints are enabled to maintain referential integrity.
 
-Use the built-in continuous integration in GitLab.
+## 📱 Features
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+### 1. MainActivity (Home Screen)
+- Clean academic-style UI with gradient background
+- Four main navigation buttons:
+  - **Manage Student** → ManageStudentActivity
+  - **Manage Course** → ManageCourseActivity
+  - **Enroll Student** → EnrollStudentActivity
+  - **View Enrollments** → ViewEnrollmentsActivity
 
-***
+### 2. ManageStudentActivity
+**CRUD Operations for Students:**
+- ✅ **Create:** Add new students with name, email, and phone
+- ✅ **Read:** View all students in a ListView
+- ✅ **Update:** Select a student from the list and update their information
+- ✅ **Delete:** Remove students from the database
+- ✅ Click on any student in the list to populate the form fields
 
-# Editing this README
+### 3. ManageCourseActivity
+**CRUD Operations for Courses:**
+- ✅ **Create:** Add new courses with name, code, and credits
+- ✅ **Read:** View all courses in a ListView
+- ✅ **Update:** Select a course from the list and modify its details
+- ✅ **Delete:** Remove courses from the database
+- ✅ Course codes are unique (enforced by database constraint)
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### 4. EnrollStudentActivity
+**Enrollment Management:**
+- 📋 Two Spinners (dropdowns) for selecting:
+  - Student (populated from database)
+  - Course (populated from database)
+- ✅ **Enroll Button:** Creates enrollment with current date
+- ✅ **Duplicate Prevention:** Checks if student is already enrolled in the course
+- ✅ **ListView:** Displays all current enrollments with student names and course names
 
-## Suggestions for a good README
+### 5. ViewEnrollmentsActivity
+**View & Export:**
+- 📋 ListView displaying all enrollments with full details:
+  - Student Name → Course Name (Date)
+- 📤 **Export to CSV:** Exports all data (students, courses, enrollments) to a CSV file
+- 💾 CSV files are saved to internal storage with timestamp
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## 🎨 UI Design
 
-## Name
-Choose a self-explaining name for your project.
+### Color Scheme
+- **Primary Blue:** `#1565C0` (academic/professional tone)
+- **Primary Dark:** `#0D47A1`
+- **Accent Orange:** `#FFA726`
+- **Background Gradient:** Light blue gradient (`#E3F2FD` → `#90CAF9`)
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+### UI Components
+- **Rounded Buttons:** 12dp corner radius for main menu, 8dp for action buttons
+- **EditText Fields:** Custom border with 8dp rounded corners
+- **ListView:** Clean dividers for easy reading
+- **Consistent Spacing:** 16dp padding throughout
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+## 💾 Data Persistence
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### SQLite Database
+- **Database Name:** `AcademicManagement.db`
+- **Version:** 1
+- **Features:**
+  - Foreign key constraints enabled
+  - CASCADE delete for enrollments when students/courses are deleted
+  - Proper exception handling in all database operations
+  - Automatic database connection closing
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### SharedPreferences
+The `PreferencesHelper` class provides:
+- **Last Screen Tracking:** Saves which screen was last opened
+- **Theme Preference:** Dark/light theme toggle (placeholder)
+- **Reminders:** User preference for showing reminders
+- **First Launch Detection:** Tracks if this is the first time the app is opened
+- **Custom Key-Value Storage:** Generic methods for saving preferences
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+## 📤 CSV Export
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+The `CSVExporter` class provides:
+- **Export All Data:** Single CSV file with all students, courses, and enrollments
+- **Individual Exports:** Separate methods for students, courses, or enrollments
+- **Timestamp Naming:** Files named with format `all_data_YYYYMMDD_HHMMSS.csv`
+- **Location:** Files saved to app's internal storage
+- **CSV Escaping:** Proper handling of commas and quotes in data
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+## 🔧 Technical Specifications
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+### Build Configuration
+- **Language:** Java (100% - no Kotlin)
+- **Minimum SDK:** 31 (Android 12)
+- **Target SDK:** 36
+- **Compile SDK:** 36
+- **Java Version:** 11
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+### Dependencies
+- `androidx.appcompat`
+- `com.google.android.material`
+- `androidx.activity`
+- `androidx.constraintlayout`
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## 🚀 How to Run
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+1. **Open in Android Studio:**
+   ```
+   File → Open → Select this project folder
+   ```
 
-## License
-For open source projects, say how it is licensed.
+2. **Sync Gradle:**
+   - Android Studio will automatically sync Gradle files
+   - Wait for the build to complete
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+3. **Run the App:**
+   - Connect an Android device (API 31+) or start an emulator
+   - Click the "Run" button or press `Shift + F10`
+
+## 📖 Usage Instructions
+
+### Adding Students
+1. Open "Manage Student"
+2. Fill in Name, Email, and Phone
+3. Click "Save"
+4. Student appears in the list below
+
+### Updating Students
+1. Open "Manage Student"
+2. Click on a student in the list
+3. Modify the fields
+4. Click "Update"
+
+### Adding Courses
+1. Open "Manage Course"
+2. Fill in Course Name, Course Code, and Credits
+3. Click "Save"
+4. Course appears in the list below
+
+### Enrolling Students
+1. Open "Enroll Student"
+2. Select a student from the dropdown
+3. Select a course from the dropdown
+4. Click "Enroll Student"
+5. Enrollment appears in the list with current date
+
+### Exporting Data
+1. Open "View Enrollments"
+2. Click "Export to CSV"
+3. Toast message shows the file location
+4. File can be found in app's internal storage
+
+## 🔒 Error Handling
+
+- ✅ **SQLite Exceptions:** All database operations wrapped in try-catch-finally
+- ✅ **Input Validation:** Checks for empty fields before saving
+- ✅ **Duplicate Prevention:** Prevents duplicate enrollments
+- ✅ **Foreign Key Constraints:** Database enforces referential integrity
+- ✅ **User Feedback:** Toast messages for all operations (success/failure)
+
+## 📝 Code Quality
+
+- ✅ **Clean Code:** Well-organized with clear naming conventions
+- ✅ **Separation of Concerns:** Activities, Models, DAO, and Utils properly separated
+- ✅ **Resource Management:** Database connections properly closed
+- ✅ **DRY Principle:** Reusable DAO and utility classes
+- ✅ **Consistent Styling:** Uniform UI across all screens
+- ✅ **No Linter Errors:** Code passes all Android Studio linter checks
+
+## 🎯 Requirements Checklist
+
+- ✅ Java only (no Kotlin)
+- ✅ SQLite database with 3 tables
+- ✅ CRUD operations for Students and Courses
+- ✅ Enrollment management with foreign keys
+- ✅ ListView displays with simple_list_item_1
+- ✅ Spinners for student/course selection
+- ✅ CSV export functionality
+- ✅ SharedPreferences implementation
+- ✅ Intent-based navigation between activities
+- ✅ Proper package organization (activities, models, dao, utils)
+- ✅ Clean academic-style UI with background
+- ✅ Rounded buttons with consistent styling
+- ✅ All activities have Back buttons
+- ✅ Exception handling in all database operations
+- ✅ AndroidManifest properly configured
+
+## 🔍 Testing
+
+### Manual Testing Checklist
+- [ ] Add multiple students
+- [ ] Update student information
+- [ ] Delete a student
+- [ ] Add multiple courses
+- [ ] Update course information
+- [ ] Delete a course
+- [ ] Enroll student in course
+- [ ] Try to enroll same student in same course (should fail)
+- [ ] View all enrollments
+- [ ] Export data to CSV
+- [ ] Navigate between all screens
+- [ ] Test Back buttons
+
+## 🌟 Additional Features
+
+- **Automatic Date Recording:** Enrollment date is automatically set to current date
+- **Sorted Lists:** Students sorted by name, courses by code
+- **User-Friendly Display:** ListView items show ID, name/code, and relevant details
+- **Last Screen Tracking:** App remembers which screen was last visited
+- **Timestamp Tracking:** Last update time saved in SharedPreferences
+
+## 📞 Support
+
+For issues or questions about this project, please refer to the code comments and this README.
+
+---
+
+**Project Name:** 25782__midterm  
+**Type:** Android Application (Java)  
+**Purpose:** Academic Management System  
+**Date:** October 2025
+
+
